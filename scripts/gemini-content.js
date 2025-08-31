@@ -80,7 +80,7 @@ async function typeAndSend(element, text) {
 }
 
 // Function to wait for the input element
-function waitForInput(maxAttempts = 40) {
+function waitForInput(maxAttempts = 3) {
     // console.log('Starting to wait for input element');
     return new Promise((resolve) => {
         let attempts = 0;
