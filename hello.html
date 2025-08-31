@@ -53,6 +53,11 @@
   </head>
   <body>
     <h2>Youtube Summarizer</h2>
+    <div class="custom-prompt-section">
+        <input type="checkbox" id="useCustomPrompt">
+        <label for="useCustomPrompt">Use Custom Prompt</label>
+        <textarea id="customPrompt" rows="3" style="width: 100%; margin-top: 5px;" disabled></textarea>
+    </div>
     <div class="density-options">
       <div class="option">
         <input type="radio" id="concise" name="density" value="concise" checked>
@@ -74,7 +79,7 @@
     </div>
     <button id="summarizeButton">Summarize Video</button>
     <div style="text-align: center; margin-top: 10px;">
-      <a href="https://github.com/your-username/your-repo/issues" target="_blank" style="font-size: 12px; color: #666;">Report an issue</a>
+      <a href="https://github.com/srikary12/youtube-summarizer/issues" target="_blank" style="font-size: 12px; color: #666;">Report an issue</a>
     </div>
     <script src="popup.js"></script>
   </body>

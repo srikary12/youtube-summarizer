@@ -16,7 +16,7 @@
       "js": ["scripts/gemini-content.js"]
     }
   ],
-  "permissions": ["activeTab", "scripting", "tabs"],
+  "permissions": ["activeTab", "scripting", "tabs", "storage"],
   "host_permissions": [
     "https://gemini.google.com/*"
   ],
