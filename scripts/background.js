@@ -1,4 +1,3 @@
-// Keep track of the tab we want to interact with
 let targetTab = null;
 
 // Initialize the service worker
@@ -14,7 +13,8 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         // Store the YouTube URL and prompt
         targetTab = {
             prompt: request.prompt,
-            attempts: 0
+            attempts: 0,
+            scriptInjected: false // Flag to track script injection
         };
         
         // Create Gemini tab
@@ -42,6 +42,7 @@ async function injectContentScript(tabId) {
             target: { tabId: tabId },
             files: ['scripts/gemini-content.js']
         });
+        targetTab.scriptInjected = true; // Set the flag
         // console.log('Content script injection successful');
         return true;
     } catch (error) {
@@ -58,20 +59,21 @@ function sendPromptToTab(tabId, prompt, attempt = 1) {
         prompt: prompt
     }, (response) => {
         const error = chrome.runtime.lastError;
-        if (error || !response) {
-            // console.log('Attempt failed:', error ? error.message : 'No response');
+        if (error || !response || !response.success) {
+            // console.log('Attempt failed:', error ? error.message : 'No or unsuccessful response');
             if (attempt < 5) {
                 setTimeout(() => sendPromptToTab(tabId, prompt, attempt + 1), 2000);
             }
         } else {
-            // console.log('Successfully sent prompt');
+            // console.log('Successfully sent prompt, clearing target tab.');
+            targetTab = null; // Clear the target tab to prevent re-injection
         }
     });
 }
 
 // Listen for tab updates
 chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
-    if (targetTab && tabId === targetTab.tabId && changeInfo.status === 'complete') {
+    if (targetTab && tabId === targetTab.tabId && !targetTab.scriptInjected && changeInfo.status === 'complete') {
         // console.log('Gemini tab loaded, injecting content script...');
         injectContentScript(tabId);
     }

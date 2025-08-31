@@ -113,19 +113,16 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     // console.log('Message received:', request);
     
     if (request.action === 'setPrompt') {
-        // Acknowledge receipt of message
-        sendResponse({ received: true });
-        
         // Handle the prompt
         waitForInput().then(async (inputElement) => {
             if (inputElement) {
                 // Add a small delay to ensure the page is fully responsive
                 setTimeout(async () => {
                     const success = await typeAndSend(inputElement, request.prompt);
-                    // console.log('Type and send result:', success);
+                    sendResponse({ success: success });
                 }, 500);
             } else {
-                // console.error('Failed to find input element after maximum attempts');
+                sendResponse({ success: false });
             }
         });
         
