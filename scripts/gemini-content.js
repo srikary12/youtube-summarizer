@@ -80,21 +80,24 @@ async function typeAndSend(element, text) {
 }
 
 // Function to wait for the input element
-function waitForInput(maxAttempts = 20) {
+function waitForInput(maxAttempts = 40) {
     // console.log('Starting to wait for input element');
     return new Promise((resolve) => {
         let attempts = 0;
         
         const checkForInput = () => {
-            // console.log(`Attempt ${attempts + 1} of ${maxAttempts}`);
-            const input = findInputElement();
-            
-            if (input) {
-                // console.log('Input element found, resolving promise');
-                resolve(input);
-            } else if (attempts < maxAttempts) {
+            if (document.readyState === 'complete' || document.readyState === 'interactive') {
+                const input = findInputElement();
+                if (input) {
+                    // console.log('Input element found, resolving promise');
+                    resolve(input);
+                    return;
+                }
+            }
+
+            if (attempts < maxAttempts) {
                 attempts++;
-                setTimeout(checkForInput, 500);
+                setTimeout(checkForInput, 1000);
             } else {
                 // console.log('Max attempts reached, resolving with null');
                 resolve(null);
@@ -116,8 +119,11 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         // Handle the prompt
         waitForInput().then(async (inputElement) => {
             if (inputElement) {
-                const success = await typeAndSend(inputElement, request.prompt);
-                // console.log('Type and send result:', success);
+                // Add a small delay to ensure the page is fully responsive
+                setTimeout(async () => {
+                    const success = await typeAndSend(inputElement, request.prompt);
+                    // console.log('Type and send result:', success);
+                }, 500);
             } else {
                 // console.error('Failed to find input element after maximum attempts');
             }
