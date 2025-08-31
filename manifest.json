@@ -1,7 +1,7 @@
 {
   "name": "Youtube Summariser",
-  "description": "summarises youtube",
-  "version": "1.0",
+  "description": "summarises youtube videos in gemini",
+  "version": "0.1",
   "manifest_version": 3,
   "action": {
     "default_popup": "hello.html"
@@ -10,10 +10,6 @@
     {
       "matches": ["https://www.youtube.com/*"],
       "js": ["scripts/content.js"]
-    },
-    {
-      "matches": ["https://gemini.google.com/*"],
-      "js": ["scripts/gemini-content.js"]
     }
   ],
   "permissions": ["activeTab", "scripting", "tabs", "storage"],
