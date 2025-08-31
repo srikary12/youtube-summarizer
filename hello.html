@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Youtube Summarizer</title>
+    <style>
+      body {
+        width: 300px;
+        padding: 15px;
+        font-family: Arial, sans-serif;
+      }
+      button {
+        width: 100%;
+        padding: 10px;
+        margin: 10px 0;
+        background-color: #4285f4;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+      }
+      button:hover {
+        background-color: #3367d6;
+      }
+      h2 {
+        color: #333;
+        margin-top: 0;
+      }
+      .density-options {
+        margin: 15px 0;
+        padding: 10px;
+        border: 1px solid #e0e0e0;
+        border-radius: 4px;
+      }
+      .option {
+        margin: 8px 0;
+        display: flex;
+        align-items: center;
+      }
+      .option input[type="radio"] {
+        margin-right: 10px;
+      }
+      .option label {
+        font-size: 14px;
+        color: #444;
+      }
+      .description {
+        font-size: 12px;
+        color: #666;
+        margin-left: 24px;
+        margin-top: 2px;
+      }
+    </style>
+  </head>
+  <body>
+    <h2>Youtube Summarizer</h2>
+    <div class="density-options">
+      <div class="option">
+        <input type="radio" id="concise" name="density" value="concise" checked>
+        <label for="concise">Concise</label>
+      </div>
+      <div class="description">Brief overview with key points only</div>
+
+      <div class="option">
+        <input type="radio" id="balanced" name="density" value="balanced">
+        <label for="balanced">Balanced</label>
+      </div>
+      <div class="description">Moderate detail with main points and some context</div>
+
+      <div class="option">
+        <input type="radio" id="detailed" name="density" value="detailed">
+        <label for="detailed">Detailed</label>
+      </div>
+      <div class="description">Comprehensive summary with extensive details</div>
+    </div>
+    <button id="summarizeButton">Summarize Video</button>
+    <div style="text-align: center; margin-top: 10px;">
+      <a href="https://github.com/your-username/your-repo/issues" target="_blank" style="font-size: 12px; color: #666;">Report an issue</a>
+    </div>
+    <script src="popup.js"></script>
+  </body>
+</html>
