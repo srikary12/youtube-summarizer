@@ -21,14 +21,24 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         chrome.tabs.create({ url: 'https://gemini.google.com/app' }, (tab) => {
             targetTab.tabId = tab.id;
             // console.log('Created Gemini tab:', tab.id);
+            
+            // Wait for the tab to be fully loaded before injecting the script
+            chrome.tabs.onUpdated.addListener(function listener(tabId, info) {
+                if (tabId === tab.id && info.status === 'complete') {
+                    chrome.tabs.onUpdated.removeListener(listener);
+                    injectContentScript(tab.id);
+                }
+            });
         });
         
         sendResponse({ status: 'initializing' });
         return true;
     } else if (request.action === 'geminiReady') {
-        // Content script is ready, send the prompt
+        // Content script is ready, wait a bit more before sending the prompt
         if (targetTab && sender.tab.id === targetTab.tabId) {
-            sendPromptToTab(sender.tab.id, targetTab.prompt);
+            setTimeout(() => {
+                sendPromptToTab(sender.tab.id, targetTab.prompt);
+            }, 1000);
         }
         return true;
     }
@@ -71,10 +81,24 @@ function sendPromptToTab(tabId, prompt, attempt = 1) {
     });
 }
 
-// Listen for tab updates
-chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
-    if (targetTab && tabId === targetTab.tabId && !targetTab.scriptInjected && changeInfo.status === 'complete') {
-        // console.log('Gemini tab loaded, injecting content script...');
-        injectContentScript(tabId);
-    }
-});
+// Function to send prompt to tab
+function sendPromptToTab(tabId, prompt, attempt = 1) {
+    // console.log(`Sending prompt to tab ${tabId}, attempt ${attempt}`);
+    chrome.tabs.sendMessage(tabId, {
+        action: 'setPrompt',
+        prompt: prompt
+    }, (response) => {
+        const error = chrome.runtime.lastError;
+        if (error || !response || !response.success) {
+            // console.log('Attempt failed:', error ? error.message : 'No or unsuccessful response');
+            if (attempt < 3) { // Reduced max attempts since we have better initial timing
+                setTimeout(() => sendPromptToTab(tabId, prompt, attempt + 1), 2000);
+            } else {
+                targetTab = null;
+            }
+        } else {
+            // console.log('Successfully sent prompt, clearing target tab.');
+            targetTab = null;
+        }
+    });
+}
