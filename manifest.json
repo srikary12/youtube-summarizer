@@ -6,12 +6,7 @@
   "action": {
     "default_popup": "hello.html"
   },
-  "content_scripts": [
-    {
-      "matches": ["https://www.youtube.com/*"],
-      "js": ["scripts/content.js"]
-    }
-  ],
+  "content_scripts": [],
   "permissions": ["activeTab", "scripting", "tabs", "storage"],
   "host_permissions": [
     "https://gemini.google.com/*"

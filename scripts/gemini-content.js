@@ -49,28 +49,32 @@ async function typeAndSend(element, text) {
         }
         // console.log('Text content set');
 
-        // Dispatch multiple events to ensure it's registered
+        // Short delay for text to be set
+        await new Promise(resolve => setTimeout(resolve, 100));
+
+        // Dispatch events in quick succession
         const events = ['input', 'change', 'keyup'];
         events.forEach(eventType => {
             element.dispatchEvent(new Event(eventType, { bubbles: true }));
-            // console.log(`${eventType} event dispatched`);
         });
 
-        // Additional keypress simulation
+        // Brief pause before Enter key events
+        await new Promise(resolve => setTimeout(resolve, 100));
+
+        // Simulate Enter key press quickly
         element.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }));
         element.dispatchEvent(new KeyboardEvent('keypress', { key: 'Enter', bubbles: true }));
         element.dispatchEvent(new KeyboardEvent('keyup', { key: 'Enter', bubbles: true }));
-        // console.log('Enter key events simulated');
 
-        // Clear the input after a short delay
-        setTimeout(() => {
-            if (element.tagName.toLowerCase() === 'textarea') {
-                element.value = '';
-            } else {
-                element.textContent = '';
-            }
-            // console.log('Input cleared');
-        }, 300);
+        // Wait a shorter time for the message to be sent
+        await new Promise(resolve => setTimeout(resolve, 500));
+
+        // Clear the input only after ensuring the message was sent
+        if (element.tagName.toLowerCase() === 'textarea') {
+            element.value = '';
+        } else {
+            element.textContent = '';
+        }
 
         return true;
     } catch (error) {
@@ -80,26 +84,37 @@ async function typeAndSend(element, text) {
 }
 
 // Function to wait for the input element
-function waitForInput(maxAttempts = 40) {
+function waitForInput(maxAttempts = 3) {
     // console.log('Starting to wait for input element');
     return new Promise((resolve) => {
         let attempts = 0;
         
         const checkForInput = () => {
-            if (document.readyState === 'complete' || document.readyState === 'interactive') {
+            // Only proceed if the document is fully loaded
+            if (document.readyState === 'complete') {
                 const input = findInputElement();
                 if (input) {
-                    // console.log('Input element found, resolving promise');
-                    resolve(input);
+                    // Wait a bit more to ensure the chat interface is fully initialized
+                    setTimeout(() => {
+                        // Verify the element is still valid
+                        if (input.isConnected && input.offsetParent !== null) {
+                            resolve(input);
+                        } else {
+                            continueChecking();
+                        }
+                    }, 500);
                     return;
                 }
             }
+            
+            continueChecking();
+        };
 
+        const continueChecking = () => {
             if (attempts < maxAttempts) {
                 attempts++;
                 setTimeout(checkForInput, 1000);
             } else {
-                // console.log('Max attempts reached, resolving with null');
                 resolve(null);
             }
         };
